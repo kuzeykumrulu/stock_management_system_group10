@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="toolbar">
+  <h2>{{ cfg.title }}</h2>
+  {% if can('insert', name) %}
+  <a class="btn btn-primary" href="{{ url_for('insert_row', name=name) }}">+ Add New</a>
+  {% else %}<span class="muted">Read-only for the {{ current_role }} role</span>{% endif %}
+</div>
+<table>
+  <tr>
+    {% for col, label, typ, extra in cfg.fields %}<th>{{ label }}</th>{% endfor %}
+    <th style="width:140px">Actions</th>
+  </tr>
+  {% for r in rows %}
+  <tr>
+    {% for col, label, typ, extra in cfg.fields %}
+      {% if typ == 'fk' %}<td>{{ labels[col].get(r[col], r[col]) }}</td>
+      {% elif typ in ('int', 'decimal') %}<td class="num">{{ r[col] | fmt }}</td>
+      {% else %}<td>{{ r[col] | fmt }}</td>{% endif %}
+    {% endfor %}
+    <td>
+      {% set q = {} %}{% for k in cfg.pk %}{% set _ = q.update({k: r[k]}) %}{% endfor %}
+      {% if can('update', name) %}<a class="btn btn-edit" href="{{ url_for('update_row', name=name, **q) }}">Edit</a>{% endif %}
+      {% if can('delete', name) %}
+      <form class="inline" method="post" action="{{ url_for('delete_row', name=name) }}"
+            onsubmit="return confirm('Delete this record?');">
+        {% for k in cfg.pk %}<input type="hidden" name="{{ k }}" value="{{ r[k] }}">{% endfor %}
+        <button class="btn btn-del">Delete</button>
+      </form>
+      {% endif %}
+      {% if not can('update', name) and not can('delete', name) %}<span class="muted">view only</span>{% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

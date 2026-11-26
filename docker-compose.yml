@@ -1,0 +1,44 @@
+# CMPE341 - Stock Management System
+# Start everything with:   docker compose up
+# Then open:               http://localhost   (or http://<server-ip> on the cloud VM)
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: stockdb
+      POSTGRES_USER: stockuser
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-stockpass}
+    volumes:
+      # Scripts in /docker-entrypoint-initdb.d run automatically (in name order)
+      # the first time the database is created: tables -> sample data -> users.
+      - ./sql/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./sql/02_data.sql:/docker-entrypoint-initdb.d/02_data.sql:ro
+      - ./sql/04_users.sql:/docker-entrypoint-initdb.d/04_users.sql:ro
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      # TCP check: only succeeds after the init scripts have finished
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U stockuser -d stockdb"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  web:
+    build: ./webapp
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGPORT: "5432"
+      PGDATABASE: stockdb
+      PGUSER: stockuser
+      PGPASSWORD: ${DB_PASSWORD:-stockpass}
+      SECRET_KEY: ${SECRET_KEY:-please-change-this-secret-key}
+    ports:
+      - "${APP_PORT:-80}:5000"
+
+volumes:
+  db_data:

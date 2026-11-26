@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Login – Stock Management System</title>
+<style>
+  body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: #23395B; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .box { background: #fff; width: 360px; padding: 30px 32px; border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,.25); }
+  h1 { font-size: 20px; margin: 0 0 4px; color: #23395B; }
+  p.sub { margin: 0 0 20px; color: #6B7785; font-size: 13px; }
+  label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 4px; }
+  input { width: 100%; box-sizing: border-box; padding: 9px 10px; border: 1px solid #C9D2DD; border-radius: 4px; font-size: 14px; }
+  button { width: 100%; margin-top: 20px; padding: 10px; background: #2F6FB2; color: #fff; border: 0; border-radius: 5px; font-size: 15px; cursor: pointer; }
+  .flash { padding: 9px 12px; border-radius: 5px; margin-bottom: 12px; font-size: 13px; }
+  .flash.ok { background: #E1F4E6; color: #1C6B33; }
+  .flash.err { background: #FBE3E1; color: #A1261B; }
+</style>
+</head>
+<body>
+<form class="box" method="post">
+  <h1>Stock Management System</h1>
+  <p class="sub">Please sign in to continue</p>
+  {% with msgs = get_flashed_messages(with_categories=true) %}
+    {% for cat, m in msgs %}<div class="flash {{ cat }}">{{ m }}</div>{% endfor %}
+  {% endwith %}
+  <label for="username">Username</label>
+  <input id="username" name="username" autocomplete="username" required autofocus>
+  <label for="password">Password</label>
+  <input id="password" name="password" type="password" autocomplete="current-password" required>
+  <button type="submit">Log in</button>
+</form>
+</body>
+</html>

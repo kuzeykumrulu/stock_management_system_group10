@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ 'Add New' if mode == 'insert' else 'Edit' }} &mdash; {{ cfg.title }}</h2>
+{% set qs = {} %}{% if keys %}{% for k in cfg.pk %}{% set _ = qs.update({k: keys[loop.index0]}) %}{% endfor %}{% endif %}
+<form class="card" method="post"
+      action="{{ url_for('insert_row', name=name) if mode == 'insert' else url_for('update_row', name=name, **qs) }}">
+  {% for col, label, typ, extra in cfg.fields %}
+    {% set is_pk = col in cfg.pk %}
+    {% if is_pk and cfg.auto %}
+      {% if mode == 'update' %}
+        <label>{{ label }}</label><input value="{{ row[col] }}" readonly>
+      {% endif %}
+    {% else %}
+      {% set locked = is_pk and mode == 'update' %}
+      {% set val = row[col] if row and col in row else '' %}
+      <label>{{ label }}</label>
+      {% if typ == 'fk' %}
+        <select name="{{ col }}" {{ 'disabled' if locked }} required>
+          <option value="">-- select --</option>
+          {% for o in options[col] %}
+          <option value="{{ o.id }}" {{ 'selected' if val|string == o.id|string }}>{{ o.label }}</option>
+          {% endfor %}
+        </select>
+      {% elif typ == 'enum' %}
+        <select name="{{ col }}" required>
+          {% for o in extra %}<option {{ 'selected' if val == o }}>{{ o }}</option>{% endfor %}
+        </select>
+      {% elif typ == 'date' %}
+        <input type="date" name="{{ col }}" value="{{ val | fmt }}">
+      {% elif typ == 'int' %}
+        <input type="number" step="1" name="{{ col }}" value="{{ val if val is not none }}" {{ 'readonly' if locked }}>
+      {% elif typ == 'decimal' %}
+        <input type="number" step="0.01" name="{{ col }}" value="{{ val if val is not none }}">
+      {% else %}
+        <input type="text" name="{{ col }}" value="{{ val if val is not none }}">
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  <div style="margin-top:18px">
+    <button class="btn btn-primary">{{ 'Insert' if mode == 'insert' else 'Save Changes' }}</button>
+    <a class="btn btn-grey" href="{{ url_for('list_rows', name=name) }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

@@ -4,7 +4,7 @@ Database Design & Management (CMPE341) term project.
 A web application for managing products, stock levels in multiple warehouses, suppliers,
 customers, purchase orders and sales orders. PostgreSQL 16 + Python (Flask).
 
-**Live demo:** http://SERVER-IP-ADDRESS  &nbsp;&nbsp;*(cloud VM – see [DEPLOYMENT.md](DEPLOYMENT.md))*
+**Live demo:** http://162.243.165.86  &nbsp;&nbsp;*(DigitalOcean Droplet – see [DEPLOYMENT.md](DEPLOYMENT.md))*
 
 ---
 
@@ -13,8 +13,8 @@ customers, purchase orders and sales orders. PostgreSQL 16 + Python (Flask).
 Requirements: [Docker](https://docs.docker.com/get-docker/) with Docker Compose.
 
 ```bash
-git clone https://github.com/GITHUB-USERNAME/stock-management-system-group-X.git
-cd stock-management-system-group-X
+git clone https://github.com/kuzeykumrulu/stock_management_system_group10.git
+cd stock_management_system_group10
 docker compose up
 ```
 
